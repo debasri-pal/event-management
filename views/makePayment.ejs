@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Make Payment</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .payment-card {
+            background: #ffffff;
+            padding: 40px;
+            width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .payment-card h2 {
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .payment-card p {
+            color: #555;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #2563eb;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .pay-btn:hover {
+            background: #1e40af;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #2563eb;
+            font-size: 13px;
+        }
+
+        .icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="payment-card">
+        <div class="icon">💳</div>
+        <h2>Make Payment</h2>
+        <p>Enter the amount you want to pay for membership.</p>
+
+        <form action="/makePayment" method="POST">
+
+            <div class="input-group">
+                <label>Amount (₹)</label>
+                <input type="number" name="amount" placeholder="Enter amount" required min="1">
+            </div>
+
+            <button type="submit" class="pay-btn">Pay Now</button>
+        </form>
+
+        <a href="/userDashboard" class="back-link">← Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

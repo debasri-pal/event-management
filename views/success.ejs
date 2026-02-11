@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Success</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+
+        .success-card {
+            background: white;
+            padding: 50px;
+            width: 420px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .check-icon {
+            font-size: 50px;
+            color: #22c55e;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            margin: 10px 0;
+            color: #0f172a;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(90deg, #2563eb, #22c55e);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="success-card">
+        <div class="check-icon">✔</div>
+        <h2>Payment Successful 💳</h2>
+        <p>Your transaction has been recorded successfully.</p>
+
+        <a href="/userDashboard" class="btn">Go Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

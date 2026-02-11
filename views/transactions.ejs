@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Transactions</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  Event Management - Admin Panel
+</div>
+
+<div class="dashboard">
+
+<div class="sidebar">
+
+  <% if (user.role === "admin") { %>
+    <h3>Admin Panel</h3>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/maintenance">Maintenance</a>
+    <a href="/reports">Reports</a>
+    <a href="/transactions">Transactions</a>
+    <a href="/logout">Logout</a>
+  <% } else { %>
+    <h3>User Panel</h3>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/makePayment">Make Payment</a>
+    <a href="/transactions">My Transactions</a>
+    <a href="/logout">Logout</a>
+  <% } %>
+
+</div>
+
+
+  <div class="main">
+<div class="card">
+  <h2>
+    <% if (user.role === "admin") { %>
+      All Transactions 💳
+    <% } else { %>
+      My Transactions 💳
+    <% } %>
+  </h2>
+
+  <table class="transaction-table">
+    <thead>
+      <tr>
+        <% if (user.role === "admin") { %>
+          <th>User Email</th>
+        <% } %>
+        <th>Amount (₹)</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% transactions.forEach(t => { %>
+        <tr>
+          <% if (user.role === "admin") { %>
+            <td><%= t.userEmail %></td>
+          <% } %>
+          <td>₹<%= t.amount %></td>
+          <td><%= new Date(t.date).toDateString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+
+</div>
+
+</body>
+</html>

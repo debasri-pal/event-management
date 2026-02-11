@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Membership</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  Event Management - Admin Panel
+</div>
+
+<div class="dashboard">
+
+  <div class="sidebar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/maintenance">Maintenance</a>
+    <a href="/reports">Reports</a>
+    <a href="/transactions">Transactions</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h2>Update Membership ✏</h2>
+
+      <form method="POST" action="/updateMembership">
+
+        <label>User Email</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Action</label><br><br>
+
+        <input type="radio" name="action" value="extend" checked>
+        Extend (Default 6 Months)<br>
+
+        <input type="radio" name="action" value="cancel">
+        Cancel Membership<br><br>
+
+        <button type="submit">Submit</button>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

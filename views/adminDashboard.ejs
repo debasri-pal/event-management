@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  Event Management - Admin Panel
+</div>
+
+<div class="dashboard">
+
+  <div class="sidebar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/maintenance">Maintenance</a>
+    <a href="/reports">Reports</a>
+    <a href="/transactions">Transactions</a>
+    <a href="/flowchart">Flow Chart</a>
+
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h2>Welcome, Admin 👋</h2>
+      <p>Manage users, memberships and monitor transactions here.</p>
+      <div class="stats-container">
+  <div class="stat-card">
+    <h3>Total Transactions</h3>
+    <p><%= totalTransactions %></p>
+  </div>
+
+  <div class="stat-card">
+    <h3>Total Revenue</h3>
+    <p>₹<%= totalAmount %></p>
+  </div>
+
+  <div class="stat-card">
+    <h3>Active Members</h3>
+    <p><%= activeMembers %></p>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

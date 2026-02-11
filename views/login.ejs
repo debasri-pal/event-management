@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Event Management</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="login-card">
+            
+            <h2>Event Management</h2>
+            <p class="login-subtitle">Sign in to continue</p>
+
+            <form action="/login" method="POST">
+                
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Enter your email" required>
+
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required>
+
+                <button type="submit" class="login-btn">Login</button>
+                <p style="margin-top:15px;">
+  <a href="/forgot-password">Forgot Password?</a>
+</p>
+
+
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>
