@@ -350,3 +350,25 @@ input {
   color: #3b82f6;
   text-decoration: none;
 }
+.badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Status Colors */
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.Requested { background: #ffc107; color: black; }
+.Confirmed { background: #17a2b8; color: white; }
+.InProgress { background: #6f42c1; color: white; }
+.Completed { background: #28a745; color: white; }
+.Cancelled { background: #dc3545; color: white; }
+

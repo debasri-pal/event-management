@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add User</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  Event Management - Admin Panel
+</div>
+
+<div class="dashboard">
+
+  <div class="sidebar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/maintenance">Maintenance</a>
+    <a href="/reports">Reports</a>
+    <a href="/transactions">Transactions</a>
+    <a href="/addUser">Add User</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h2>Add New User</h2>
+
+      <form method="POST" action="/addUser">
+
+        <label>Name</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Email</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Password</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <label>Role</label><br>
+        <select name="role" required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select><br><br>
+
+        <button type="submit">Create User</button>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -41,6 +41,20 @@
       My Transactions 💳
     <% } %>
   </h2>
+  <!-- 🔍 SEARCH + FILTER FORM -->
+  <form method="GET" action="/transactions" style="margin-bottom:20px;">
+<input type="text" name="search" placeholder="Search by email"
+value="<%= request.query.search || '' %>">
+
+<input type="date" name="startDate"
+value="<%= request.query.startDate || '' %>">
+
+<input type="date" name="endDate"
+value="<%= request.query.endDate || '' %>">
+
+
+    <button type="submit">Apply</button>
+  </form>
 
   <table class="transaction-table">
     <thead>
@@ -48,8 +62,11 @@
         <% if (user.role === "admin") { %>
           <th>User Email</th>
         <% } %>
+        
         <th>Amount (₹)</th>
+        <th>Status</th>
         <th>Date</th>
+
       </tr>
     </thead>
 
@@ -59,12 +76,30 @@
           <% if (user.role === "admin") { %>
             <td><%= t.userEmail %></td>
           <% } %>
-          <td>₹<%= t.amount %></td>
-          <td><%= new Date(t.date).toDateString() %></td>
+<td>₹<%= t.amount %></td>
+
+<td>
+  <span class="badge <%= t.status.replace(/\s/g, '') %>">
+    <%= t.status %>
+  </span>
+</td>
+
+<td><%= new Date(t.createdAt).toDateString() %></td>
+
         </tr>
       <% }) %>
     </tbody>
   </table>
+  <!-- 📄 PAGINATION -->
+<div class="pagination" style="margin-top:20px;">
+  <% for(let i = 1; i <= totalPages; i++) { %>
+<a href="/transactions?page=<%= i %>&search=<%= request.query.search || '' %>&startDate=<%= request.query.startDate || '' %>&endDate=<%= request.query.endDate || '' %>">
+  <%= i %>
+</a>
+
+  <% } %>
+</div>
+
 </div>
 
 

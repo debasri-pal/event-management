@@ -18,7 +18,7 @@
     <a href="/reports">Reports</a>
     <a href="/transactions">Transactions</a>
     <a href="/flowchart">Flow Chart</a>
-
+    <a href="/addUser">Add User</a>
     <a href="/logout">Logout</a>
   </div>
 
@@ -29,12 +29,14 @@
       <div class="stats-container">
   <div class="stat-card">
     <h3>Total Transactions</h3>
-    <p><%= totalTransactions %></p>
+    <p><%= totalOrders %></p>
+
   </div>
 
   <div class="stat-card">
     <h3>Total Revenue</h3>
-    <p>₹<%= totalAmount %></p>
+    <p>₹<%= totalRevenue %></p>
+
   </div>
 
   <div class="stat-card">
@@ -42,11 +44,63 @@
     <p><%= activeMembers %></p>
   </div>
 </div>
+<h3 style="margin-top:30px;">Recent Orders</h3>
+
+<table border="1" cellpadding="10" style="width:100%; margin-top:10px;">
+  <tr>
+    <th>User</th>
+    <th>Amount</th>
+    <th>Status</th>
+    <th>Update</th>
+  </tr>
+
+  <% recentOrders.forEach(order => { %>
+    <tr>
+      <td><%= order.userEmail %></td>
+      <td>₹ <%= order.amount %></td>
+      <td><%= order.status %></td>
+      <td>
+        <form action="/updateStatus/<%= order._id %>" method="POST">
+          <select name="status" onchange="this.form.submit()">
+            <option <%= order.status === "Requested" ? "selected" : "" %>>Requested</option>
+            <option <%= order.status === "Confirmed" ? "selected" : "" %>>Confirmed</option>
+            <option <%= order.status === "In Progress" ? "selected" : "" %>>In Progress</option>
+            <option <%= order.status === "Completed" ? "selected" : "" %>>Completed</option>
+            <option <%= order.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+          </select>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+
+</table>
+
 
     </div>
   </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('revenueChart');
+
+const labels = <%- JSON.stringify(monthlyData.map(m => "Month " + m._id)) %>;
+const data = <%- JSON.stringify(monthlyData.map(m => m.total)) %>;
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'Monthly Revenue',
+      data: data,
+      backgroundColor: '#4e73df'
+    }]
+  }
+});
+</script>
+
+
 
 </body>
 </html>

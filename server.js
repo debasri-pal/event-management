@@ -109,24 +109,47 @@ app.post("/login", async (req, res) => {
 // Admin Dashboard
 app.get("/dashboard", isLoggedIn, isAdmin, async (req, res) => {
 
-  const totalTransactions = await Transaction.countDocuments();
+  const totalOrders = await Transaction.countDocuments();
 
-  const totalAmountData = await Transaction.aggregate([
+  const totalRevenueData = await Transaction.aggregate([
     { $group: { _id: null, total: { $sum: "$amount" } } }
   ]);
 
-  const totalAmount = totalAmountData[0]?.total || 0;
+  const totalRevenue = totalRevenueData[0]?.total || 0;
 
-  const activeMembers = await User.countDocuments({
-    membershipExpiry: { $gt: new Date() }
+  const pendingOrders = await Transaction.countDocuments({
+    status: "Requested"
   });
 
-  res.render("adminDashboard", {
-    totalTransactions,
-    totalAmount,
-    activeMembers
-  });
+  const monthlyData = await Transaction.aggregate([
+    {
+      $group: {
+        _id: { $month: "$createdAt" },
+        total: { $sum: "$amount" }
+      }
+    },
+    { $sort: { "_id": 1 } }
+  ]);
+  const recentOrders = await Transaction.find()
+  .sort({ createdAt: -1 })
+  .limit(5);
+
+const activeMembers = await User.countDocuments({
+  membershipExpiry: { $gt: new Date() }
 });
+res.render("adminDashboard", {
+  totalOrders,
+  totalRevenue,
+  pendingOrders,
+  activeMembers,
+  monthlyData,
+  recentOrders   // 🔴 THIS MUST BE HERE
+});
+
+});
+
+
+
 
 // User Dashboard
 app.get("/userDashboard", isLoggedIn, isUser, (req, res) => {
@@ -161,23 +184,81 @@ app.post("/addMembership", isLoggedIn, isAdmin, async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.send("User not found");
 
-    const months = parseInt(duration);
+const months = parseInt(duration);
 
-    const expiry = new Date();
-    expiry.setMonth(expiry.getMonth() + months);
+// If user already has active membership, extend from that date
+const baseDate =
+  user.membershipExpiry && user.membershipExpiry > new Date()
+    ? new Date(user.membershipExpiry)
+    : new Date();
 
-    user.membershipType = months + " months";
-    user.membershipExpiry = expiry;
+baseDate.setMonth(baseDate.getMonth() + months);
+
+user.membershipExpiry = baseDate;
+user.membershipType = "Active";   // ⭐ Force correct status
+
+await user.save();
+
 
     await user.save();
 
-    res.render("success", {
-        message: "Membership Added Successfully 🎉",
-        subMessage: "The membership has been activated."
-    });
+res.render("success", {
+  title: "Membership Added Successfully",
+  message: "The membership has been activated.",
+  redirectUrl: "/dashboard",
+  buttonText: "Go to Dashboard"
+});
+
 
 });
 
+
+// ======================
+// Update Membership Page (Admin Only)
+// ======================
+
+app.get("/updateMembership", isLoggedIn, isAdmin, (req, res) => {
+    res.render("updateMembership");
+});
+app.post("/updateMembership", isLoggedIn, isAdmin, async (req, res) => {
+
+  const { email, action } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.send("User not found");
+  }
+
+  const today = new Date();
+
+  if (action === "extend") {
+
+    const baseDate = user.membershipExpiry && user.membershipExpiry > today
+      ? new Date(user.membershipExpiry)
+      : today;
+
+    baseDate.setMonth(baseDate.getMonth() + 6);
+
+    user.membershipExpiry = baseDate;
+    user.membershipType = "Active";
+
+  } else if (action === "cancel") {
+
+    user.membershipExpiry = today;
+    user.membershipType = "Expired";
+  }
+
+  await user.save();
+
+  res.render("success", {
+    title: "Membership Updated",
+    message: `Membership has been ${action === "extend" ? "extended" : "cancelled"} successfully.`,
+    redirectUrl: "/dashboard",
+    buttonText: "Go to Dashboard"
+  });
+
+});
 
 // ======================
 // Reports (Admin Only)
@@ -204,31 +285,63 @@ app.get("/reports", isLoggedIn, isAdmin, async (req, res) => {
 
 app.get("/transactions", isLoggedIn, async (req, res) => {
 
-  try {
+  const search = req.query.search || "";
+  const { startDate, endDate } = req.query;
+  const page = parseInt(req.query.page) || 1;
+  const limit = 5;
+  const skip = (page - 1) * limit;
 
-    let transactions;
+  let query = {};
 
-    if (req.session.user.role === "admin") {
-      // Admin sees all transactions
-      transactions = await Transaction.find().sort({ createdAt: -1 });
-    } else {
-      // User sees only their own transactions
-      transactions = await Transaction.find({
-        userEmail: req.session.user.email
-      }).sort({ createdAt: -1 });
+  if (req.session.user.role === "admin") {
+    if (search) {
+      query.userEmail = { $regex: search, $options: "i" };
     }
-
-    res.render("transactions", {
-      transactions,
-      user: req.session.user
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.send("Error loading transactions");
+  } else {
+    query.userEmail = req.session.user.email;
   }
 
+if (startDate && endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999); // include full end day
+
+  query.createdAt = {
+    $gte: start,
+    $lte: end
+  };
+}
+
+
+  const total = await Transaction.countDocuments(query);
+
+  const transactions = await Transaction.find(query)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+console.log("Final Query:", query);
+console.log("Total Documents:", total);
+
+res.render("transactions", {
+  transactions,
+  currentPage: page,
+  totalPages: Math.ceil(total / limit),
+  user: req.session.user,
+  request: req   // 👈 add this
 });
+
+
+});
+
+app.post("/updateStatus/:id", isLoggedIn, isAdmin, async (req, res) => {
+
+  await Transaction.findByIdAndUpdate(req.params.id, {
+    status: req.body.status
+  });
+
+  res.redirect("/dashboard");
+});
+
 //Add Flow Chart Link on All Pages
 app.get("/flowchart", isLoggedIn, (req, res) => {
     res.render("flowchart");
@@ -252,16 +365,58 @@ app.post("/makePayment", isLoggedIn, isUser, async (req, res) => {
 
   const newTransaction = new Transaction({
     userEmail: req.session.user.email,
-    amount
+    amount,
+    status: "Requested",
+    category: "Membership",
+    paymentMethod: "UPI"
   });
 
   await newTransaction.save();
 
-  res.render("success", {
-    message: "Payment Successful 💳",
-    subMessage: "Transaction recorded."
-  });
+res.render("success", {
+  title: "Payment Successful",
+  message: "Your transaction has been recorded successfully.",
+  redirectUrl: "/userDashboard",
+  buttonText: "Go to Dashboard"
 });
+
+});
+// ===============================
+// ADD USER (ADMIN ONLY)
+// ===============================
+
+// Show Add User Page
+app.get("/addUser", isLoggedIn, isAdmin, (req, res) => {
+  res.render("addUser");
+});
+
+// Handle Add User Form
+app.post("/addUser", isLoggedIn, isAdmin, async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.send("User already exists");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = new User({
+    name,
+    email,
+    password: hashedPassword,
+    role
+  });
+
+  await newUser.save();
+return res.render("success", {
+  title: "User Created Successfully",
+  message: "The new user has been added to the system.",
+  redirectUrl: "/dashboard",
+  buttonText: "Go to Dashboard"
+});
+});
+
 
 // ======================
 // Forgot Password
